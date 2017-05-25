@@ -1,0 +1,5 @@
+{
+    "eslint.enable": true,
+    "javascript.validate.enable": false,
+    "npm-intellisense.scanDevDependencies": true
+}
