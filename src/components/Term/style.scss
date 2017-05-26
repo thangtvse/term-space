@@ -1,6 +1,6 @@
 .termWrapper {
     width: 480px;
-    background-color: #000000;
+    background-color: #252526;
     padding: 8px;
     position: absolute;
     top: 0;
@@ -12,17 +12,30 @@
         width: 8px;
     }
      ::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 1);
+        background: rgba(255, 255, 255, 0.2);
     }
      ::-webkit-scrollbar-thumb {
         background: rgba(100, 100, 100, .4)
     }
     .terminal-header {
         height: 24px;
-        color: white;
+        color: #ccc;
+        position: relative;
+        .close-terminal {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            font-size: 16px;
+            cursor: pointer;
+            color: #ccc; // background: white;
+            // border-radius: 50px;
+        }
     }
     .terminal {
         font-size: 14px;
-        font-family: 'Fira Mono', monospace,
+        font-family: 'Fira Mono', monospace;
+        .xterm-viewport {
+            background: #252526;
+        }
     }
 }

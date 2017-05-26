@@ -1,6 +1,6 @@
 .termWrapper {
   width: 480px;
-  background-color: #000000;
+  background-color: #252526;
   padding: 8px;
   position: absolute;
   top: 0;
@@ -11,12 +11,22 @@
   .termWrapper ::-webkit-scrollbar {
     width: 8px; }
   .termWrapper ::-webkit-scrollbar-track {
-    background: black; }
+    background: rgba(255, 255, 255, 0.2); }
   .termWrapper ::-webkit-scrollbar-thumb {
     background: rgba(100, 100, 100, 0.4); }
   .termWrapper .terminal-header {
     height: 24px;
-    color: white; }
+    color: #ccc;
+    position: relative; }
+    .termWrapper .terminal-header .close-terminal {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      font-size: 16px;
+      cursor: pointer;
+      color: #ccc; }
   .termWrapper .terminal {
     font-size: 14px;
-    font-family: "Fira Mono", monospace; }
+    font-family: 'Fira Mono', monospace; }
+    .termWrapper .terminal .xterm-viewport {
+      background: #252526; }

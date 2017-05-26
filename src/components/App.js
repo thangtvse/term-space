@@ -7,6 +7,7 @@ import { getAllTerms } from "../reducers";
 import { addTerm, resizeTerm, focusTerm, moveTerm } from "../actions/terms";
 import TermComponent from "./Term";
 import "./App.css";
+import config from "../config";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -45,6 +46,7 @@ class App extends Component {
           onend: this._onDragEnd.bind(this),
           max: 1
       })
+      .ignoreFrom("a")
       .on("tap", event => {
           const target = event.target;
           const parent = target.parentNode;
@@ -125,10 +127,10 @@ class App extends Component {
         let x = parseFloat(draggableChild.getAttribute("data-x")) || 0;
         let y = parseFloat(draggableChild.getAttribute("data-y")) || 0;
 
-        const width = event.rect.width;
-        const height = event.rect.height;
+        const width = event.rect.width - 18;
+        const height = event.rect.height - 18;
 
-        if (width <= 200 || height <= 100) {
+        if (width <= config.termMinWidth || height <= config.termMinHeight) {
             return;
         }
 

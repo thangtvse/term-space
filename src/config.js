@@ -6,10 +6,12 @@ export default {
         cursorBlink: false,
         focusKeys: false,
         noEvents: false,
-        useStyle: true,
+    // useStyle: true,
         name: "xterm-color"
     },
 
     termHeight: 364,
-    termWidth: 480
+    termWidth: 480,
+    termMinHeight: 200,
+    termMinWidth: 300
 };

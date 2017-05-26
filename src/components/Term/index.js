@@ -4,11 +4,31 @@ import { connect } from "react-redux";
 
 import "./style.css";
 import { getTermById } from "../../reducers/index";
+import { closeTerm } from "../../actions/terms";
+
+window.require("xterm/dist/addons/fit/fit.js");
 
 class TermComponent extends React.Component {
     componentDidMount() {
         const { termId, term } = this.props;
         term.xTerm.open(document.getElementById(termId));
+
+    // term.fit();
+
+    // var initialGeometry = term.proposeGeometry(),
+
+    //     cols = initialGeometry.cols,
+
+    //     rows = initialGeometry.rows;
+
+    // debugger;
+    }
+
+    _close(event) {
+        const { closeTerm, termId } = this.props;
+        event.preventDefaults;
+        event.stopPropagation();
+        closeTerm(termId);
     }
 
     render() {
@@ -22,6 +42,9 @@ class TermComponent extends React.Component {
       >
         <div className="terminal-header draggable">
           {termId}
+          <a className="close-terminal" onClick={this._close.bind(this)}>
+            <i className="fa fa-times-circle fa-fw" aria-hidden="true" />
+          </a>
         </div>
         <div id={termId} />
       </div>
@@ -31,11 +54,14 @@ class TermComponent extends React.Component {
 
 TermComponent.propTypes = {
     termId: PropTypes.number.isRequired,
-    term: PropTypes.object.isRequired
+    term: PropTypes.object.isRequired,
+    closeTerm: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state, { termId }) => ({
     term: getTermById(state, termId)
 });
 
-export default connect(mapStateToProps)(TermComponent);
+export default connect(mapStateToProps, {
+    closeTerm
+})(TermComponent);

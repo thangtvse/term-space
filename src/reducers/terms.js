@@ -1,6 +1,6 @@
 import {
   ADD_TERM,
-  REMOVE_TERM,
+  CLOSE_TERM,
   FORCUS_TERM,
   MOVE_TERM,
   RESIZE_TERM
@@ -95,9 +95,25 @@ const terms = (
         };
     }
 
-    case REMOVE_TERM: {
+    case CLOSE_TERM: {
+        const termZindex = getTermById(state, action.id).zIndex;
+        const newById = {};
+
+        getAllTerms(state).map(term => {
+            if (term.zIndex > termZindex) {
+                newById[term.id] = {
+                    ...term,
+                    zIndex: term.zIndex - 1
+                };
+            } else if (term.zIndex < termZindex) {
+                newById[term.id] = {
+                    ...term
+                };
+            }
+        });
+
         return {
-            byId: _.omit(state.byId, action.id),
+            byId: newById,
             allIds: state.allIds.filter(id => id !== action.id)
         };
     }

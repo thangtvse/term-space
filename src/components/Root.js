@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import App from "./App";
 
 import "xterm/dist/xterm.css";
+import "font-awesome-webpack";
 
 /**
  * 
