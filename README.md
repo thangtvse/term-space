@@ -5,7 +5,7 @@ A terminal workspace that built on electron. It allows you to use multiple termi
 ## Future works
 * Rewrite terminal front-end instead of using xterm.js. It's very pure and too buggy
 * Auto-align: horizontally, vertically, 4x4,...
-* Changable titles
+* Editable titles
 * Double click for maximization 
 
 
