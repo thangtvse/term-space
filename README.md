@@ -1,5 +1,5 @@
 # term-space
-A terminal workspace that built on electron
+A terminal workspace that built on electron. It allows you to use multiple terminals in one single window with convenience.
 
 ![term-space](http://i.imgur.com/e2ahtG1.png)
 ## Future works
