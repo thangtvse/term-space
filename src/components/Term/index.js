@@ -6,8 +6,6 @@ import "./style.css";
 import { getTermById } from "../../reducers/index";
 import { closeTerm } from "../../actions/terms";
 
-window.require("xterm/dist/addons/fit/fit.js");
-
 class TermComponent extends React.Component {
     componentDidMount() {
         const { termId, term } = this.props;
