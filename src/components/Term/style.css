@@ -1,5 +1,5 @@
 .termWrapper {
-  width: 495px;
+  width: 480px;
   background-color: #000000;
   padding: 8px;
   position: absolute;
@@ -15,6 +15,8 @@
   .termWrapper ::-webkit-scrollbar-thumb {
     background: rgba(100, 100, 100, 0.4); }
   .termWrapper .terminal-header {
-    height: 24px; }
+    height: 24px;
+    color: white; }
   .termWrapper .terminal {
-    font-size: 14px; }
+    font-size: 14px;
+    font-family: "Fira Mono", monospace; }

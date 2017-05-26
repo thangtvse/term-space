@@ -1,5 +1,5 @@
 .termWrapper {
-    width: 495px;
+    width: 480px;
     background-color: #000000;
     padding: 8px;
     position: absolute;
@@ -19,8 +19,10 @@
     }
     .terminal-header {
         height: 24px;
+        color: white;
     }
     .terminal {
         font-size: 14px;
+        font-family: 'Fira Mono', monospace,
     }
 }

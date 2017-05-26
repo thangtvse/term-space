@@ -3,8 +3,8 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import interact from "interactjs";
 
-import { getAllTermIds } from "../reducers";
-import { addTerm, resizeTerm, resizeShell, focusTerm } from "../actions/terms";
+import { getAllTerms } from "../reducers";
+import { addTerm, resizeTerm, focusTerm, moveTerm } from "../actions/terms";
 import TermComponent from "./Term";
 import "./App.css";
 
@@ -31,50 +31,24 @@ class App extends Component {
           inertia: true,
         // keep the element within the area of it's parent
           restrict: {
-              restriction: ".App",
+              restriction: ".drag-restriction",
               endOnly: true,
               elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
           },
-        // restrict: function(x, y, element) {
-        //     const parent = element.parentNode;
-        //     const width = parent.offsetWidth;
-        //     const height = parent.offsetHeight;
-        //     const right = x + width;
-        //     const bottom = y + height;
-        //     const appElement = document.getElementsByClassName("App")[0];
 
-        //     let rectX = x;
-        //     let rectY = y;
-
-        //     if (right >= appElement.offsetWidth) {
-        //         rectX = appElement.offsetWidth - width;
-        //     }
-
-        //     if (bottom >= appElement.offsetHeight) {
-        //         rectY = appElement.offsetHeight - height;
-        //     }
-
-        //     const rect = {
-        //         x: rectX,
-        //         y: rectY,
-        //         width,
-        //         height
-        //     };
-
-        //     return rect;
-        // },
         // enable autoScroll
           autoScroll: false,
 
         // call this function on every dragmove event
           onmove: this._onDragMove.bind(this),
           onstart: this._onDragStart.bind(this),
+          onend: this._onDragEnd.bind(this),
           max: 1
       })
       .on("tap", event => {
           const target = event.target;
           const parent = target.parentNode;
-          this.props.focusTerm(parseInt(parent.dataset.termId));
+          this.props.focusTerm(parseInt(parent.dataset.termId, 10));
       });
 
     // // this is used later in the resizing and gesture demos
@@ -84,6 +58,9 @@ class App extends Component {
       .resizable({
           preserveAspectRatio: false,
           edges: { left: true, right: true, bottom: true, top: true },
+          restrict: {
+              restriction: "parent"
+          },
           max: 1
       })
       .on("resizestart", this._onResizeStart.bind(this))
@@ -94,13 +71,13 @@ class App extends Component {
     _onDragStart(event) {
         const target = event.target;
         const parent = target.parentNode;
-        this.props.focusTerm(parseInt(parent.dataset.termId));
+        this.props.focusTerm(parseInt(parent.dataset.termId, 10));
     }
 
     _onResizeStart(event) {
         const target = event.target;
         const termId = target.dataset.termId;
-        this.props.focusTerm(parseInt(termId));
+        this.props.focusTerm(parseInt(termId, 10));
     }
 
   /**
@@ -114,24 +91,6 @@ class App extends Component {
 
     // translate the element
         const parent = target.parentNode;
-        const appElement = document.getElementsByClassName("App")[0];
-
-    //     if (
-    //   !this._checkRestrictionForDrag(
-    //     oldX,
-    //     oldY,
-    //     parent.offsetWidth,
-    //     parent.offsetHeight,
-    //     event.dx,
-    //     event.dy,
-    //     appElement.offsetWidth,
-    //     appElement.offsetHeight
-    //   )
-    // ) {
-    //         return;
-    //     }
-
-        window.console.log(event.dx + " " + event.dy);
 
     // keep the dragged position in the data-x/data-y attributes
         const x = oldX + event.dx;
@@ -143,6 +102,15 @@ class App extends Component {
     // update the posiion attributes
         target.setAttribute("data-x", x);
         target.setAttribute("data-y", y);
+    }
+
+    _onDragEnd(event) {
+        const target = event.target;
+        const id = parseInt(target.parentNode.dataset.termId, 10);
+        const x = parseFloat(target.getAttribute("data-x")) || 0;
+        const y = parseFloat(target.getAttribute("data-y")) || 0;
+
+        this.props.moveTerm(id, x, y);
     }
 
   /**
@@ -157,15 +125,13 @@ class App extends Component {
         let x = parseFloat(draggableChild.getAttribute("data-x")) || 0;
         let y = parseFloat(draggableChild.getAttribute("data-y")) || 0;
 
-    //     if (
-    //   !this._checkRestriction(target, document.getElementsByClassName(".App"))
-    // ) {
-    //         return;
-    //     }
-
-    // update the element's style
         const width = event.rect.width;
         const height = event.rect.height;
+
+        if (width <= 200 || height <= 100) {
+            return;
+        }
+
         target.style.width = width + "px";
         target.style.height = height + "px";
 
@@ -180,11 +146,15 @@ class App extends Component {
         draggableChild.setAttribute("data-y", y);
 
     // Calculate height and width
-        const cols = Math.round((width - 18) / 8);
-        const rows = Math.round((height - 18 - 8) / 17);
+        const cols = Math.round((width - 2) / 8);
+        const rows = Math.round((height - 24) / 17);
         const termId = target.dataset.termId;
 
-        this.props.resizeTerm(termId, cols, rows);
+    // this.props.resizeTerm(termId, x, y, width, height, cols, rows);
+
+        const id = parseInt(termId, 10);
+        const term = this.props.terms.find(term => term.id === id);
+        term.xTerm.resize(cols, rows);
     }
 
   /**
@@ -193,13 +163,16 @@ class App extends Component {
  */
     _onResizeEnd(event) {
         const target = event.target;
+        const draggableChild = target.firstChild;
         const width = target.offsetWidth;
         const height = target.offsetHeight;
         const cols = Math.round((width - 16) / 8);
         const rows = Math.round((height - 18 - 8) / 17);
         const termId = target.dataset.termId;
+        const x = parseFloat(draggableChild.getAttribute("data-x")) || 0;
+        const y = parseFloat(draggableChild.getAttribute("data-y")) || 0;
 
-        this.props.resizeShell(termId, cols, rows);
+        this.props.resizeTerm(termId, x, y, width, height, cols, rows);
     }
 
     _checkRestrictionForDrag(
@@ -228,19 +201,17 @@ class App extends Component {
  * 
  * @param {*} termIds 
  */
-    _generateTermComponents(termIds) {
-        return termIds.map(termId => (
-      <TermComponent termId={termId} key={termId} />
-    ));
+    _generateTermComponents(terms) {
+        return terms.map(term => <TermComponent termId={term.id} key={term.id} />);
     }
 
     render() {
-        const { addTerm, termIds } = this.props;
+        const { terms } = this.props;
 
         return (
       <div className="App">
-        <div className="terms">
-          {this._generateTermComponents(termIds)}
+        <div className="drag-restriction">
+          {this._generateTermComponents(terms)}
         </div>
       </div>
         );
@@ -249,19 +220,19 @@ class App extends Component {
 
 App.propTypes = {
     addTerm: PropTypes.func.isRequired,
-    termIds: PropTypes.arrayOf(PropTypes.number).isRequired,
+    terms: PropTypes.arrayOf(PropTypes.object).isRequired,
     resizeTerm: PropTypes.func.isRequired,
-    resizeShell: PropTypes.func.isRequired,
+    moveTerm: PropTypes.func.isRequired,
     focusTerm: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-    termIds: getAllTermIds(state)
+    terms: getAllTerms(state)
 });
 
 export default connect(mapStateToProps, {
     addTerm,
     resizeTerm,
-    resizeShell,
+    moveTerm,
     focusTerm
 })(App);

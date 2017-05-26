@@ -8,5 +8,8 @@ export default {
         noEvents: false,
         useStyle: true,
         name: "xterm-color"
-    }
+    },
+
+    termHeight: 364,
+    termWidth: 480
 };

@@ -1,6 +1,15 @@
+html {
+    overflow: hidden;
+}
+
 body {
     margin: 0;
     padding: 0;
     font-family: sans-serif;
     background: #F0F0F0;
+}
+
+@font-face {
+    font-family: "Fira Mono";
+    src: url("./assets/fonts/FiraMono-Bold.ttf") format("ttf"), url("./assets/fonts/FiraMono-Medium.ttf") format("ttf"), url("./assets/fonts/FiraMono-Regular.ttf") format("ttf"),
 }

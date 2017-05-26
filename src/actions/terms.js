@@ -2,7 +2,7 @@ import uuid from "uuid";
 import Term from "xterm";
 
 import config from "../config";
-import { ADD_TERM, FORCUS_TERM } from "./types";
+import { ADD_TERM, FORCUS_TERM, MOVE_TERM, RESIZE_TERM } from "./types";
 import { getTermById } from "../reducers";
 const ipcRenderer = window.require("electron").ipcRenderer;
 
@@ -22,11 +22,20 @@ export const addTerm = () => dispatch => {
         dispatch({
             type: ADD_TERM,
             id: termId,
-            data: term
+            data: {
+                xTerm: term,
+                x: 0,
+                y: 0,
+                height: config.termHeight,
+                width: config.termWidth,
+                cols: config.termOptions.cols,
+                rows: config.termOptions.rows
+            }
         });
 
         ipcRenderer.on("shell-data", (event, { termId, data }) => {
             if (termId === thisTermId) {
+                window.console.log(data);
                 term.write(data);
             }
         });
@@ -51,15 +60,23 @@ export const focusTerm = termId => dispatch => {
     });
 };
 
-export const resizeTerm = (termId, cols, rows) => (dispatch, getState) => {
-    const term = getTermById(getState(), termId);
-    term.resize(cols, rows);
-};
+export const moveTerm = (termId, x, y) => ({
+    type: MOVE_TERM,
+    id: termId,
+    x,
+    y
+});
 
-export const resizeShell = (shellId, cols, rows) => (dispatch, getState) => {
-    ipcRenderer.send("term-resize", { shellId, cols, rows });
-
-  //  const term = getTermById(getState(), shellId);
-
-  //  term.refresh(0, rows - 1);
+export const resizeTerm = (id, x, y, width, height, cols, rows) => {
+    ipcRenderer.send("term-resize", { shellId: id, cols, rows });
+    return {
+        type: RESIZE_TERM,
+        id,
+        width,
+        height,
+        cols,
+        rows,
+        x,
+        y
+    };
 };

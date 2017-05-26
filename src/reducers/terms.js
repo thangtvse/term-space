@@ -1,68 +1,115 @@
-import { ADD_TERM, REMOVE_TERM, FORCUS_TERM } from "../actions/types";
+import {
+  ADD_TERM,
+  REMOVE_TERM,
+  FORCUS_TERM,
+  MOVE_TERM,
+  RESIZE_TERM
+} from "../actions/types";
 import _ from "lodash";
 
 const terms = (
   state = {
       byId: {},
-      allIds: [],
-      zIndexes: []
+      allIds: []
   },
   action
 ) => {
-    let maxZIndex = _.max(state.zIndexes);
-    if (isNaN(maxZIndex)) {
-        maxZIndex = 0;
-    }
-
     switch (action.type) {
-    case ADD_TERM:
+    case ADD_TERM: {
         const byId = {
             ...state.byId
         };
-        byId[action.id] = action.data;
+        byId[action.id] = {
+            ...action.data,
+            zIndex: findMaxZIndex(state) + 1
+        };
 
         return {
             byId,
-            allIds: [...state.allIds, action.id],
-            zIndexes: [...state.zIndexes, maxZIndex + 1]
+            allIds: [...state.allIds, action.id]
         };
+    }
 
-    case FORCUS_TERM:
-        const indexOfZIndex = state.allIds.indexOf(action.id);
+    case FORCUS_TERM: {
+        const newById = {};
 
-        if (indexOfZIndex === -1) {
-            return state;
-        }
+        const termZindex = getTermById(state, action.id).zIndex;
 
-        const termZIndex = state.zIndexes[indexOfZIndex];
-
-        const decreaseGreater = zIndex => {
-            if (zIndex > termZIndex) {
-                return zIndex - 1;
+        getAllTerms(state).map(term => {
+            if (term.id === action.id) {
+                newById[action.id] = {
+                    ...term,
+                    zIndex: findMaxZIndex(state)
+                };
             } else {
-                return zIndex;
+                if (term.zIndex > termZindex) {
+                    newById[term.id] = {
+                        ...term,
+                        zIndex: term.zIndex - 1
+                    };
+                } else {
+                    newById[term.id] = {
+                        ...term
+                    };
+                }
             }
-        };
+        });
+
         return {
             ...state,
-            zIndexes: [
-                ...state.zIndexes.slice(0, indexOfZIndex).map(decreaseGreater),
-                maxZIndex,
-                ...state.zIndexes
-            .slice(indexOfZIndex + 1, state.zIndexes.length)
-            .map(decreaseGreater)
-            ]
+            byId: newById
+        };
+    }
+
+    case MOVE_TERM: {
+        const term = getTermById(state, action.id);
+        const newById = { ...state.byId };
+        newById[action.id] = {
+            ...term,
+            x: action.x,
+            y: action.y
         };
 
-    case REMOVE_TERM:
+        return {
+            ...state,
+            byId: newById
+        };
+    }
+
+    case RESIZE_TERM: {
+        const term = getTermById(state, action.id);
+        const newById = { ...state.byId };
+        newById[action.id] = {
+            ...term,
+            x: action.x,
+            y: action.y,
+            width: action.width,
+            height: action.height,
+            cols: action.cols,
+            rows: action.rows
+        };
+
+        return {
+            ...state,
+            byId: newById
+        };
+    }
+
+    case REMOVE_TERM: {
         return {
             byId: _.omit(state.byId, action.id),
             allIds: state.allIds.filter(id => id !== action.id)
         };
+    }
 
     default:
         return state;
     }
+};
+
+const findMaxZIndex = state => {
+    const term = _.maxBy(getAllTerms(state), term => term.zIndex);
+    return term ? term.zIndex : 0;
 };
 
 // selectors
@@ -84,14 +131,10 @@ export const getAllTermIds = state => state.allIds;
  * Get all terms
  * @param {*} state 
  */
-export const getAllTerms = state => state.allIds.map(id => state.byId[id]);
-
-/**
- * Get zIndex for a term
- * @param {*} state 
- * @param {*} id 
- */
-export const getZIndexForTerm = (state, id) =>
-  state.zIndexes[state.allIds.indexOf(id)];
+export const getAllTerms = state =>
+  state.allIds.map(id => ({
+      ...state.byId[id],
+      id
+  }));
 
 export default terms;

@@ -30,12 +30,4 @@ export const getAllTermIds = state => fromTerms.getAllTermIds(state.terms);
  */
 export const getAllTerms = state => fromTerms.getAllTerms(state.terms);
 
-/**
- * Get z-index for a term
- * @param {*} state 
- * @param {*} id 
- */
-export const getZIndexForTerm = (state, id) =>
-  fromTerms.getZIndexForTerm(state.terms, id);
-
 export default app;
